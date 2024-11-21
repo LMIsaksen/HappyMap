@@ -18,8 +18,11 @@ class PlacesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.instance.getPlaces()  // Denne skal være suspend
+                Log.d("PlacesViewModel", "Response code: ${response.code()}")
                 if (response.isSuccessful) {
                     places.value = response.body() ?: emptyList()  // Hent kroppen av responsen (listen med steder)
+                    Log.d("PlacesViewModel", "Hentet steder: ${places.value}")
+
                 } else {
                     Log.e("PlacesViewModel", "Feil ved henting av steder: ${response.message()}")
                 }

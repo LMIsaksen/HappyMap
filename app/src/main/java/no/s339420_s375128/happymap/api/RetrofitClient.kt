@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://dave3600.cs.oslomet.no/~s375128/"
+    private const val BASE_URL = "https://dave3600.cs.oslomet.no/~s375128/"
 
     val instance: PlacesApi by lazy {
         Retrofit.Builder()
@@ -14,5 +14,4 @@ object RetrofitClient {
             .build()
             .create(PlacesApi::class.java)
     }
-
 }
