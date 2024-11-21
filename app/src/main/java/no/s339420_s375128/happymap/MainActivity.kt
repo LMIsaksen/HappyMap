@@ -15,9 +15,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import no.s339420_s375128.happymap.ui.theme.S339420_s375128_HappyMapTheme
-import no.s339420_s375128.happymap.viewmodels.PlacesViewModel
+import no.s339420_s375128.happymap.presentation.PlacesViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
+import no.s339420_s375128.happymap.ui.FavouritePlacesMap
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
             S339420_s375128_HappyMapTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PlacesScreen(modifier = Modifier.padding(innerPadding))
-
+                    FavouritePlacesMap(innerPadding)
                 }
             }
         }

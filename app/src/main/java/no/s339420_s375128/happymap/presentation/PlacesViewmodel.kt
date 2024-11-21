@@ -1,4 +1,4 @@
-package no.s339420_s375128.happymap.viewmodels
+package no.s339420_s375128.happymap.presentation
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
