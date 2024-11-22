@@ -1,5 +1,6 @@
 package no.s339420_s375128.happymap.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,18 +28,18 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 import no.s339420_s375128.happymap.presentation.PlacesViewModel
 
 @Composable
 fun FavouritePlacesMap(paddingValues: PaddingValues) {
     val viewModel: PlacesViewModel = viewModel()
-
     val places by viewModel.places.collectAsState(emptyList())
-
     var isDialogVisible by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var selectedLatLng by remember { mutableStateOf<LatLng?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.fetchPlaces()
@@ -63,7 +64,13 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
             onMapClick = { latLng ->
                 selectedLatLng = latLng
                 isDialogVisible = true
+                coroutineScope.launch {
+                    val result = viewModel.getAddressFromLatLng(latLng.latitude, latLng.longitude)
+                    Log.d("Geocoding", "Received address: $result")
+                    address = if (result.isBlank()) "Adresse ikke funnet" else result
+                }
             }
+
         ) {
             places.forEach { place ->
                 val markerState = rememberMarkerState(position = LatLng(place.latitude, place.longitude))
@@ -100,16 +107,20 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
 
     if (isDialogVisible) {
         AddPlaceDialog(
-            onDismiss = { isDialogVisible = false },
+            onDismiss = { isDialogVisible = false
+                selectedLatLng = null},
             onSave = { desccription ->
                 selectedLatLng?.let { latLng ->
+                    val finalAddress = if (address.isBlank()) "Ukjent adresse" else address
                     viewModel.addPlace(
-                        desccription,
-                        address = "Osloveien 50",
+                        description,
+                        address = finalAddress,
                         latLng.latitude,
                         latLng.longitude
                     )
+                    description = ""
                     isDialogVisible = false
+                    selectedLatLng = null
                 }
             },
             description = description,
