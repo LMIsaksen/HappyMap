@@ -1,7 +1,5 @@
 package no.s339420_s375128.happymap.presentation
 
-import android.content.Context
-import android.location.Geocoder
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,17 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import no.s339420_s375128.happymap.BuildConfig
+import no.s339420_s375128.happymap.api.GeocodingClient
 import no.s339420_s375128.happymap.api.RetrofitClient
 import no.s339420_s375128.happymap.data.Place
-import java.util.Locale
 
 class PlacesViewModel : ViewModel() {
 
     private val _places = MutableStateFlow<List<Place>>(emptyList())
     val places: StateFlow<List<Place>> = _places
-
-    private val _address = MutableStateFlow("")
-    val address: StateFlow<String> = _address
 
     fun fetchPlaces() {
         viewModelScope.launch {
@@ -43,8 +39,8 @@ class PlacesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val place = Place(0, description, address, latitude, longitude)
-                val response = RetrofitClient.instance.addPlace(description, address, latitude, longitude)
-
+                val response =
+                    RetrofitClient.instance.addPlace(description, address, latitude, longitude)
                 if (response.isSuccessful) {
                     _places.value = _places.value + place
                     Log.d("PlacesViewModel", "Sted lagt til: $place")
@@ -57,20 +53,24 @@ class PlacesViewModel : ViewModel() {
         }
     }
 
-    suspend fun getAddressFromLatLng(context: Context, latitude: Double, longitude: Double): String {
-        return withContext(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-                if (!addresses.isNullOrEmpty()) {
-                    addresses[0].getAddressLine(0)
+    suspend fun getAddressFromLatLng(latitude: Double, longitude: Double): String {
+        try {
+            val latLng = "$latitude,$longitude"
+            val apiKey = BuildConfig.MAPS_API_KEY
+            val response = GeocodingClient.instance.getGeocodeAddress(latLng, apiKey)
+
+            return if (response.isSuccessful) {
+                val body = response.body()
+                if (body == null || body.results.isEmpty()) {
+                    "Adresse ikke funnet"
                 } else {
-                    "Ukjent adresse"
+                    body.results[0].formatted_address
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                "Kunne ikke hente adresse"
+            } else {
+                "Feil ved geokoding"
             }
+        } catch (e: Exception) {
+            return "Kunne ikke hente adresse"
         }
     }
 }
