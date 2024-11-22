@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -100,7 +99,8 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
 
     if (isDialogVisible) {
         AddPlaceDialog(
-            onDismiss = { isDialogVisible = false },
+            onDismiss = { isDialogVisible = false
+                selectedLatLng = null},
             onSave = { desccription ->
                 selectedLatLng?.let { latLng ->
                     viewModel.addPlace(
@@ -109,7 +109,9 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
                         latLng.latitude,
                         latLng.longitude
                     )
+                    description = ""
                     isDialogVisible = false
+                    selectedLatLng = null
                 }
             },
             description = description,
