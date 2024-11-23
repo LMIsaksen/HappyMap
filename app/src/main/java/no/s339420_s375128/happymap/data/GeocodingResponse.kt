@@ -1,4 +1,4 @@
-package no.s339420_s375128.happymap.api
+package no.s339420_s375128.happymap.data
 
 data class GeocodingResponse(
     val results: List<Result>,

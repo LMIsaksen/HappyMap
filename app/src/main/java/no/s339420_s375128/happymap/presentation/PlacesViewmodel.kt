@@ -3,11 +3,9 @@ package no.s339420_s375128.happymap.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import no.s339420_s375128.happymap.BuildConfig
 import no.s339420_s375128.happymap.api.GeocodingClient
 import no.s339420_s375128.happymap.api.RetrofitClient
