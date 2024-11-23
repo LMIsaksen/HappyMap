@@ -83,7 +83,7 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
                 if (placeExists) {
                     Marker(
                         state = markerState,
-                        title = "${place.description} (Lat: ${place.latitude}, Lng: ${place.longitude})",
+                        title = place.description,
                         snippet = place.address
                     )
                 } else {
@@ -100,7 +100,6 @@ fun FavouritePlacesMap(paddingValues: PaddingValues) {
                         }
                     )
                 }
-
             }
         }
     }
